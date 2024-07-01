@@ -6,6 +6,7 @@ import io.ktor.server.engine.*
 import org.jetbrains.exposed.sql.Database
 import ru.routes.features.login.configureLoginRouting
 import ru.routes.features.register.configureRegisterRouting
+import ru.routes.features.routes.configureRoutesRouting
 import ru.routes.plugins.*
 
 fun main() {
@@ -20,4 +21,5 @@ fun Application.module() {
     configureRouting()
     configureLoginRouting()
     configureRegisterRouting()
+    configureRoutesRouting()
 }

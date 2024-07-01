@@ -12,7 +12,7 @@ import ru.routes.database.users.Users
 import java.util.*
 
 class LoginController(private val call: ApplicationCall) {
-    suspend fun performLogin(){
+    suspend fun performLogin() {
         val receive = call.receive<LoginReceiveRemote>()
         val userDTO = Users.fetchUser(receive.login)
 
@@ -29,7 +29,15 @@ class LoginController(private val call: ApplicationCall) {
                         token = token
                     )
                 )
-                call.respond(LoginResponseRemote(token = token))
+                call.respond(
+                    LoginResponseRemote(
+                        token = token,
+                        username = userDTO.username,
+                        place = userDTO.place,
+                        login = userDTO.login,
+                        email = userDTO.email
+                    )
+                )
             } else {
                 call.respond(HttpStatusCode.BadRequest, "Неверный пароль")
             }

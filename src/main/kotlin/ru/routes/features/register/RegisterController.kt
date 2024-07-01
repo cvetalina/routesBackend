@@ -9,6 +9,7 @@ import ru.routes.database.tokens.TokenDTO
 import ru.routes.database.tokens.Tokens
 import ru.routes.database.users.UserDTO
 import ru.routes.database.users.Users
+import ru.routes.features.login.LoginResponseRemote
 import ru.routes.utils.isValidEmail
 import java.util.*
 
@@ -21,9 +22,10 @@ class RegisterController(private val call: ApplicationCall) {
         //            проверяем есть ли такой пользователь
         // идем напрямую в базу
         val userDTO = Users.fetchUser(registerReceiveRemote.login)
+        println("dto -> $userDTO")
 
         if (userDTO != null) {
-            call.respond(HttpStatusCode.Conflict, "Такой пользователь уже существует")
+            call.respond(HttpStatusCode.Conflict, "user already exists")
         } else {
             // создаем токен
             val token = UUID.randomUUID().toString()
@@ -33,13 +35,13 @@ class RegisterController(private val call: ApplicationCall) {
                     UserDTO(
                         login = registerReceiveRemote.login,
                         password = registerReceiveRemote.password,
+                        username = registerReceiveRemote.username,
                         email = registerReceiveRemote.email,
-                        username = "",
                         place = registerReceiveRemote.place
                     )
                 )
             } catch (e: ExposedSQLException) {
-                call.respond(HttpStatusCode.Conflict, "Такой пользователь уже существует")
+                call.respond(HttpStatusCode.Conflict, "data base error ")
             }
 
             // вставляем запись что у нас есть такой токен
@@ -51,7 +53,14 @@ class RegisterController(private val call: ApplicationCall) {
                     token = token
                 )
             )
-            call.respond(RegisterResponseRemote(token = token))
+            call.respond(LoginResponseRemote(
+                token = token,
+                username = registerReceiveRemote.username,
+                place = registerReceiveRemote.place,
+                login = registerReceiveRemote.login,
+                email = registerReceiveRemote.email
+            )
+            )
         }
 
     }
